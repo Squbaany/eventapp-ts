@@ -9,17 +9,16 @@ import User from "../database/models/user.model";
 import Event from "../database/models/event.model";
 import Order from "../database/models/order.model";
 
-export const createUser = async (user: CreateUserParams) => {
+export async function createUser(user: CreateUserParams) {
   try {
     await connectToDatabase();
 
     const newUser = await User.create(user);
-
     return JSON.parse(JSON.stringify(newUser));
   } catch (error) {
     handleError(error);
   }
-};
+}
 
 export async function getUserById(userId: string) {
   try {
