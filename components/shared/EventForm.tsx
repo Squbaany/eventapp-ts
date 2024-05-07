@@ -29,16 +29,26 @@ import { Checkbox } from "../ui/checkbox";
 import { useUploadThing } from "@/lib/uploadthing";
 import { handleError } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import { createEvent } from "@/lib/mongodb/actions/event.actions";
+import { createEvent, updateEvent } from "@/lib/mongodb/actions/event.actions";
+import { IEvent } from "@/lib/mongodb/database/models/event.model";
 
 type EventFormProps = {
+  event?: IEvent;
   userId: string;
   type: "Create" | "Update";
 };
 
-const EventForm = ({ userId, type }: EventFormProps) => {
+const EventForm = ({ event, userId, type }: EventFormProps) => {
   const [files, setFiles] = useState<File[]>([]);
-  const initialValues = eventDefaultValues;
+  const initialValues =
+    event && type === "Update"
+      ? {
+          ...event,
+          categoryId: event.category._id,
+          startDateTime: new Date(event.startDateTime),
+          endDateTime: new Date(event.endDateTime),
+        }
+      : eventDefaultValues;
 
   const router = useRouter();
 
@@ -50,8 +60,6 @@ const EventForm = ({ userId, type }: EventFormProps) => {
   });
 
   async function onSubmit(values: z.infer<typeof eventFormSchema>) {
-    const eventData = values;
-
     let uploadedImageUrl = values.imageUrl;
 
     if (files.length > 0) {
@@ -73,6 +81,30 @@ const EventForm = ({ userId, type }: EventFormProps) => {
         if (newEvent) {
           form.reset();
           router.push(`/events/${newEvent._id}`);
+        }
+      } catch (error) {
+        handleError(error);
+      }
+    }
+
+    if (type === "Update") {
+      try {
+        if (!event) {
+          router.back();
+          return;
+        }
+
+        const eventId = event._id;
+
+        const updatedEvent = await updateEvent({
+          userId,
+          event: { ...values, imageUrl: uploadedImageUrl, _id: eventId },
+          path: `/events/${eventId}`,
+        });
+
+        if (updatedEvent) {
+          form.reset();
+          router.push(`/events/${updatedEvent._id}`);
         }
       } catch (error) {
         handleError(error);
