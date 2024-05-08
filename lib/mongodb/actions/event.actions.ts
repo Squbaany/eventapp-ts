@@ -140,7 +140,7 @@ export async function getAllEvents({
 
 export async function getEventsByUser({
   userId,
-  limit = 6,
+  limit = 3,
   page,
 }: GetEventsByUserParams) {
   try {
