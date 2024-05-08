@@ -6,6 +6,7 @@ import {
 } from "@/lib/mongodb/actions/event.actions";
 import { formatDateTime } from "@/lib/utils";
 import { SearchParamProps } from "@/types";
+import { SearchParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 import Image from "next/image";
 
 const EventDetails = async ({
@@ -101,9 +102,8 @@ const EventDetails = async ({
           emptyTitle={"No events found"}
           emptyStateSubtext={"Come back later"}
           collectionType={"All_Events"}
-          limit={6}
-          page={1}
-          totalPages={2}
+          page={searchParams.page as string}
+          totalPages={reltedEvents?.totalPages}
         />
       </section>
     </>

@@ -6,7 +6,6 @@ type CollectionProps = {
   data: IEvent[];
   emptyTitle: string;
   emptyStateSubtext: string;
-  limit: number;
   page: number | string;
   totalPages?: number;
   collectionType?: "All_Events" | "My_Tickets" | "Events_Organized";
